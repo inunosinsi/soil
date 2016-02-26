@@ -1,4 +1,5 @@
 .project
 *.exe
 soil
+session.json
 mysql.json
