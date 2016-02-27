@@ -2,7 +2,6 @@ package session
 
 import (
 	"io/ioutil"
-	"log"
 	"net/http"
 
 	"crypto/rand"
