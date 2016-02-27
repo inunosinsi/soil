@@ -3,6 +3,8 @@ package dbconf
 import (
 	"encoding/json"
 	"io/ioutil"
+	"os"
+	"strings"
 )
 
 type Config struct {
@@ -14,7 +16,13 @@ type Config struct {
 func GetDBConfig() Config {
 	var conf Config
 
-	jsonString, err := ioutil.ReadFile("./conf/mysql.json")
+	p, _ := os.Getwd()
+	if strings.Index(p, "\\") > 0 {
+		p = strings.Replace(p, "\\", "/", -1)
+	}
+	p = strings.Replace(p, "/dbconf", "", 1)
+
+	jsonString, err := ioutil.ReadFile(p + "/conf/mysql.json")
 	if err != nil {
 		panic(err)
 	}

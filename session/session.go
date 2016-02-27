@@ -3,6 +3,8 @@ package session
 import (
 	"io/ioutil"
 	"net/http"
+	"os"
+	"strings"
 
 	"crypto/rand"
 	"encoding/binary"
@@ -57,7 +59,13 @@ type SessionConfig struct {
 func getSessionConfig() SessionConfig {
 	var sconf SessionConfig
 
-	jsonString, err := ioutil.ReadFile("../conf/session.json")
+	p, _ := os.Getwd()
+	if strings.Index(p, "\\") > 0 {
+		p = strings.Replace(p, "\\", "/", -1)
+	}
+	p = strings.Replace(p, "/session", "", 1)
+
+	jsonString, err := ioutil.ReadFile(p + "/conf/session.json")
 	if err != nil {
 		panic(err)
 	}

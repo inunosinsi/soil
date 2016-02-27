@@ -1,46 +1,53 @@
 package main
 
 import (
-	"database/sql"
-
-	_ "github.com/go-sql-driver/mysql"
-
+	"html"
+	"html/template"
 	"net/http"
-	
-	"./dbconf"
+	"path/filepath"
+
+	"./login"
+	"./model/admin"
+	"./session"
 )
 
 type initHandler struct {
-	next http.Handler
+	filename string
+	t        templateHandler
 }
 
 func (h *initHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	var doRedirect = false
+	if r.Method == "POST" {
+		r.ParseForm()
+		if post_token := r.FormValue("go_token"); len(post_token) > 0 {
 
-	conf := dbconf.GetDBConfig()
+			if _, go_token := session.GetFlashSession(w, r); post_token == go_token {
+				password := html.EscapeString(r.FormValue("password"))
+				confirm := html.EscapeString(r.FormValue("confirm"))
 
-	db, err := sql.Open("mysql", conf.User+":"+conf.Pass+"@/"+conf.Db)
-	if err != nil {
-		doRedirect = true
+				//入力した内容が一致した時
+				if password == confirm {
+					loginId := html.EscapeString(r.FormValue("login_id"))
+					hash := login.CreateHashString(password)
+					id := admin.Insert(loginId, hash)
+					if id > 0 {
+						//ログインページへ飛ぶ
+						w.Header().Set("Location", "/login")
+						w.WriteHeader(http.StatusTemporaryRedirect)
+					} else {
+						w.Header().Set("Location", "/init?error")
+						w.WriteHeader(http.StatusTemporaryRedirect)
+					}
+				}
+			}
+		}
 	}
 
-	_, err = db.Query("SELECT id FROM administrator LIMIT 1")
-	if err != nil {
-		doRedirect = true
+	h.t.templ = template.Must(template.ParseFiles(filepath.Join("templates", h.filename)))
+	token, _ := session.GetFlashSession(w, r)
+	data := map[string]interface{}{
+		"Token": token,
 	}
 
-	db.Close()
-
-	//初期化フラグがtrueの場合は初期化ページへ
-	if doRedirect {
-		//初期化ページへ飛ぶ
-		w.Header().Set("Location", "/init")
-		w.WriteHeader(http.StatusTemporaryRedirect)
-	}
-
-	// 成功。ラップされたハンドラを呼び出します
-	h.next.ServeHTTP(w, r)
-}
-func CheckDB(handler http.Handler) http.Handler {
-	return &initHandler{next: handler}
+	h.t.templ.Execute(w, data)
 }

@@ -12,18 +12,19 @@ import (
 	"golang.org/x/crypto/sha3"
 
 	"../session"
+	"../model/admin"
 )
 
-//func CheckPassword(loginId string, password string) bool {
-//	passwordHash := admin.GetPasswordHashByLoginId(loginId)
-//	salt, oldHash := GetSaltAndHashByPasswordHash(passwordHash)
-//
-//	if newHash := CulcHash(password, salt); newHash == oldHash {
-//		return true
-//	} else {
-//		return false
-//	}
-//}
+func CheckPassword(loginId string, password string) bool {
+	passwordHash := admin.GetPasswordHashByLoginId(loginId)
+	salt, oldHash := GetSaltAndHashByPasswordHash(passwordHash)
+
+	if newHash := CulcHash(password, salt); newHash == oldHash {
+		return true
+	} else {
+		return false
+	}
+}
 
 func Login(r *http.Request, w http.ResponseWriter, loginId string) {
 	s := session.Get(r, "soilapp-login")

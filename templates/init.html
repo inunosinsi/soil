@@ -6,18 +6,21 @@
 <section>
 	<h1>アカウントを作成します</h1>
 	<div>
-		<dl>
-			<dt>ID</dt>
-			<dd><input type="type"></dd>
-			<dt>パスワード</dt>
-			<dd><input type="password"></dd>
-			<dt>パスワード確認用</dt>
-			<dd><input type="password"></dd>
-		</dl>
-		
-		<div>
-			<input type="submit" value="登録" class="btn " />
-		</div>
+		<form method="POST">
+			<input type="hidden" name="go_token" value="{{.Token}}">
+			<dl>
+				<dt>ID</dt>
+				<dd><input type="type" name="login_id"></dd>
+				<dt>パスワード</dt>
+				<dd><input type="password" name="password"></dd>
+				<dt>パスワード確認用</dt>
+				<dd><input type="password" name="confirm"></dd>
+			</dl>
+			
+			<div>
+				<input type="submit" value="登録">
+			</div>
+		</form>
 	</div>
 </section>
 </body>

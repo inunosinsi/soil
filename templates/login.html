@@ -1,1 +1,25 @@
-ログインページだよほげほげ
+<html>
+<head>
+<title>ログイン</title>
+</head>
+<body>
+<section>
+	<h1>ログイン</h1>
+	<div>
+		<form method="POST">
+			<input type="hidden" name="go_token" value="{{.Token}}">
+			<dl>
+				<dt>ID</dt>
+				<dd><input type="type" name="login_id"></dd>
+				<dt>パスワード</dt>
+				<dd><input type="password" name="password"></dd>
+			</dl>
+			
+			<div>
+				<input type="submit" value="ログイン">
+			</div>
+		</form>
+	</div>
+</section>
+</body>
+</html>

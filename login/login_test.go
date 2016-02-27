@@ -15,9 +15,8 @@ func TestCreateHashString(t *testing.T) {
 	}
 
 	con := "confirm"
-	newHash := CreateHashString(con)
-
-	if hash == newHash {
+	
+	if newHash := CreateHashString(con); hash == newHash {
 		t.Error("違う文字列で同じハッシュ値が生成されました")
 	}
 }
@@ -47,9 +46,9 @@ func TestCulcHash(t *testing.T) {
 		t.Error("指定されたパスワードがハッシュ化されていません")
 	}
 
-	newHash := CulcHash(pw, "456")
+	
 
-	if hash == newHash {
+	if newHash := CulcHash(pw, "456"); hash == newHash {
 		t.Error("ハッシュ化の際にソルトが効いていません")
 	}
 }

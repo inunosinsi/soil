@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"path/filepath"
 	"sync"
+
+	"./session"
 )
 
 // templは1つのテンプレートを表します
@@ -14,7 +16,7 @@ type templateHandler struct {
 	once     sync.Once
 	filename string
 	templ    *template.Template
-	token interface{}
+	token    interface{}
 }
 
 // ServeHTTPはHTTPリクエストを処理します
@@ -25,9 +27,10 @@ func (t *templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				t.filename)))
 		/** @ToDo token **/
 	})
+	token, _ := session.GetFlashSession(w, r)
 	data := map[string]interface{}{
-		"Host": r.Host,
-		"Token": nil,
+		"Host":  r.Host,
+		"Token": token,
 	}
 	//	if authCookie, err := r.Cookie("auth"); err == nil {
 	//		data["UserData"] = objx.MustFromBase64(authCookie.Value)
@@ -54,7 +57,7 @@ func main() {
 
 	//ログインページを開くときは常にAdministratorのテーブルがあるか調べる
 	http.Handle("/login", CheckDB(&templateHandler{filename: "login.html"}))
-	http.Handle("/init", &templateHandler{filename: "init.html"})
+	http.Handle("/init", &initHandler{filename: "init.html"})
 
 	log.Println("Webサーバーを開始します。ポート: ", *addr)
 	if err := http.ListenAndServe(*addr, nil); err != nil {

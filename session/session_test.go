@@ -8,6 +8,7 @@ import (
 )
 
 func TestGetFlashSession(t *testing.T) {
+
 	w := httptest.NewRecorder()
 	r, _ := http.NewRequest("GET", "", nil)
 
