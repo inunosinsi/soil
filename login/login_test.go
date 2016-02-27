@@ -22,6 +22,19 @@ func TestCreateHashString(t *testing.T) {
 	}
 }
 
+func TestGetSaltAndHashByPasswordHash(t *testing.T) {
+	phash := "sha3/123/feajwiofjweacalfjeagarj"
+	salt, hash := GetSaltAndHashByPasswordHash(phash)
+	
+	if salt == "" {
+		t.Error("暗号化されたパスワードの文字列からソルトを取得できませんでした")
+	}
+	
+	if hash == "" {
+		t.Error("暗号化されたパスワードの文字列からハッシュ値を取得できませんでした")
+	}
+}
+
 func TestCulcHash(t *testing.T) {
 	pw := "password"
 	hash := CulcHash(pw, "123")
