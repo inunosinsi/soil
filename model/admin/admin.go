@@ -9,9 +9,9 @@ import (
 )
 
 type Admin struct {
-	id       int
-	login_id string
-	password string
+	Id       int
+	LoginId string
+	Password string
 }
 
 func Check() bool {

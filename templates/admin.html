@@ -11,5 +11,13 @@
 		<input type="submit" value="登録">
 	</form>
 </section>
+
+<section>
+	<ul>
+		{{range $index, $o := .Orgs}}
+		<li><a href="/org/{{$o.Id}}">{{$o.Name}}</a></li>
+		{{end}}	
+	</ul>
+</section>
 </body>
 </html>

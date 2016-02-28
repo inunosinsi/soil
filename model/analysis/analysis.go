@@ -9,8 +9,8 @@ import (
 )
 
 type Analysis struct {
-	id       int
-	field_id int
+	Id       int
+	FieldId int
 }
 
 func Insert(field_id interface{}) int64 {

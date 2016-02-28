@@ -9,9 +9,9 @@ import (
 )
 
 type Field struct {
-	id     int
-	name   string
-	org_id int
+	Id     int
+	Name   string
+	OrgId int
 }
 
 func Insert(name interface{}, org_id interface{}) int64 {
