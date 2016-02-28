@@ -64,6 +64,9 @@ func main() {
 	initHandler := view.NewInitHandler("init.html")
 	http.Handle("/init", &initHandler)
 
+	jsonHandler := view.NewJsonHandler("call.json")
+	http.Handle("/call.json", &jsonHandler)
+
 	log.Println("Webサーバーを開始します。ポート: ", *addr)
 	if err := http.ListenAndServe(*addr, nil); err != nil {
 		log.Fatal("ListenAndServe:", err)
