@@ -1,1 +1,15 @@
-管理画面トップだよ
+<!DOCTYPE html>
+<html>
+<head>
+<title>法人名記録</title>
+</head>
+<body>
+<section>
+	<form method="POST">
+		<input type="hidden" name="go_token" value="{{.Token}}">
+		法人名：<input type="text" name="name" value="">&nbsp;
+		<input type="submit" value="登録">
+	</form>
+</section>
+</body>
+</html>

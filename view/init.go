@@ -1,19 +1,25 @@
-package main
+package view
 
 import (
 	"html"
 	"html/template"
 	"net/http"
 	"path/filepath"
+	"sync"
 
-	"./login"
-	"./model/admin"
-	"./session"
+	"../login"
+	"../model/admin"
+	"../session"
 )
 
+func NewInitHandler(filename string) initHandler {
+	return initHandler{filename: filename}
+}
+
 type initHandler struct {
+	once     sync.Once
 	filename string
-	t        templateHandler
+	templ    *template.Template
 }
 
 func (h *initHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -50,11 +56,15 @@ func (h *initHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusTemporaryRedirect)
 	}
 
-	h.t.templ = template.Must(template.ParseFiles(filepath.Join("templates", h.filename)))
+	h.once.Do(func() {
+		h.templ =
+			template.Must(template.ParseFiles(filepath.Join("templates",
+				h.filename)))
+	})
 	token, _ := session.GetFlashSession(w, r)
 	data := map[string]interface{}{
 		"Token": token,
 	}
 
-	h.t.templ.Execute(w, data)
+	h.templ.Execute(w, data)
 }

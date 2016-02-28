@@ -1,12 +1,12 @@
-package main
+package view
 
 import (
 	"html"
 	"net/http"
 
-	"./login"
-	"./model/admin"
-	"./session"
+	"../login"
+	"../model/admin"
+	"../session"
 )
 
 type checkHandler struct {

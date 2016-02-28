@@ -9,6 +9,7 @@ import (
 	"sync"
 
 	"./session"
+	"./view"
 )
 
 // templは1つのテンプレートを表します
@@ -16,7 +17,6 @@ type templateHandler struct {
 	once     sync.Once
 	filename string
 	templ    *template.Template
-	token    interface{}
 }
 
 // ServeHTTPはHTTPリクエストを処理します
@@ -52,14 +52,17 @@ func main() {
 	 * ・APIのページ
 	 */
 
-	//ログインしているか調べる
-	http.Handle("/admin", MustAuth(&templateHandler{filename: "admin.html"}))
+	//管理画面トップ
+	orgHandler := view.NewOrgHandler("admin.html")
+	http.Handle("/admin", MustAuth(&orgHandler))
 
 	//ログインページを開くときは常にAdministratorのテーブルがあるか調べる
-	http.Handle("/login", CheckDB(&templateHandler{filename: "login.html"}))
+	http.Handle("/login", view.CheckDB(&templateHandler{filename: "login.html"}))
 
-	http.Handle("/logout", Logout(&templateHandler{filename: "logout.html"}))
-	http.Handle("/init", &initHandler{filename: "init.html"})
+	http.Handle("/logout", view.Logout(&templateHandler{filename: "logout.html"}))
+
+	initHandler := view.NewInitHandler("init.html")
+	http.Handle("/init", &initHandler)
 
 	log.Println("Webサーバーを開始します。ポート: ", *addr)
 	if err := http.ListenAndServe(*addr, nil); err != nil {

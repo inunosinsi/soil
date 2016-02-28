@@ -1,9 +1,9 @@
-package main
+package view
 
 import (
 	"net/http"
 
-	"./login"
+	"../login"
 )
 
 type logoutHandler struct {
