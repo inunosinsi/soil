@@ -26,21 +26,21 @@ func CheckPassword(loginId string, password string) bool {
 	}
 }
 
-func Login(r *http.Request, w http.ResponseWriter, loginId string) {
+func Login(w http.ResponseWriter, r *http.Request, loginId string) {
 	s := session.Get(r, "soilapp-login")
 	s.Values["loginId"] = loginId
 	session.Save(r, w, s)
 }
 
-func Logout(r *http.Request, w http.ResponseWriter) {
+func Logout(w http.ResponseWriter, r *http.Request) {
 	s := session.Get(r, "soilapp-login")
 	s.Values["loginId"] = nil
 	session.Save(r, w, s)
 }
 
 func IsLoggedIn(r *http.Request) bool {
-	session := session.Get(r, "soilapp-login")
-	if loginId, _ := session.Values["loginId"].(string); len(loginId) > 0 {
+	s := session.Get(r, "soilapp-login")
+	if loginId, _ := s.Values["loginId"].(string); len(loginId) > 0 {
 		return true
 	} else {
 		return false

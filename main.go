@@ -57,6 +57,8 @@ func main() {
 
 	//ログインページを開くときは常にAdministratorのテーブルがあるか調べる
 	http.Handle("/login", CheckDB(&templateHandler{filename: "login.html"}))
+
+	http.Handle("/logout", Logout(&templateHandler{filename: "logout.html"}))
 	http.Handle("/init", &initHandler{filename: "init.html"})
 
 	log.Println("Webサーバーを開始します。ポート: ", *addr)

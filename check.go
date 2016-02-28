@@ -24,22 +24,28 @@ func (h *checkHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 				//ログイン
 				if login.CheckPassword(loginId, password) {
-					login.Login(r, w, loginId)
+					login.Login(w, r, loginId)
 					http.Redirect(w, r, "/admin", http.StatusFound)
 				} else {
 					http.Redirect(w, r, "/login?error", http.StatusFound)
 				}
 			}
 		}
-	} else {
-		isExisted := admin.Check()
+	}
 
-		//初期化フラグがtrueの場合は初期化ページへ
-		if !isExisted {
-			//初期化ページへ飛ぶ
-			w.Header().Set("Location", "/init")
-			w.WriteHeader(http.StatusTemporaryRedirect)
-		}
+	isExisted := admin.Check()
+
+	//初期化フラグがtrueの場合は初期化ページへ
+	if !isExisted {
+		//初期化ページへ飛ぶ
+		w.Header().Set("Location", "/init")
+		w.WriteHeader(http.StatusTemporaryRedirect)
+	}
+
+	if isLoggedIn := login.IsLoggedIn(r); isLoggedIn {
+		// 未認証
+		w.Header().Set("Location", "/admin")
+		w.WriteHeader(http.StatusTemporaryRedirect)
 	}
 
 	// 成功。ラップされたハンドラを呼び出します

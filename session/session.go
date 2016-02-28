@@ -21,17 +21,13 @@ func init() {
 	store = sessions.NewCookieStore([]byte(sconf.Key))
 }
 
-func Get(r *http.Request, session_key string) (session *sessions.Session) {
-	session, err := store.Get(r, session_key)
-	if err != nil {
-		panic(err)
-	}
-
-	return session
+func Get(r *http.Request, session_key string) (s *sessions.Session) {
+	s, _ = store.Get(r, session_key)
+	return s
 }
 
-func Save(r *http.Request, w http.ResponseWriter, session *sessions.Session) {
-	session.Save(r, w)
+func Save(r *http.Request, w http.ResponseWriter, s *sessions.Session) {
+	s.Save(r, w)
 }
 
 func GetFlashSession(w http.ResponseWriter, r *http.Request) (token string, go_token string) {
@@ -41,13 +37,13 @@ func GetFlashSession(w http.ResponseWriter, r *http.Request) (token string, go_t
 	token = strconv.FormatUint(n, 36)
 
 	//フラッシュセッションの値を取り出す
-	session, _ := store.Get(r, "soilapp-token")
-	if flashes := session.Flashes(); len(flashes) > 0 {
+	s, _ := store.Get(r, "soilapp-token")
+	if flashes := s.Flashes(); len(flashes) > 0 {
 		go_token, _ = flashes[0].(string)
 	}
 
-	session.AddFlash(token)
-	session.Save(r, w)
+	s.AddFlash(token)
+	s.Save(r, w)
 
 	return token, go_token
 }

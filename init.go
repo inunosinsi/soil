@@ -43,6 +43,13 @@ func (h *initHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	//既に管理者がいないかチェック
+	if isAdmin := admin.Check(); isAdmin {
+		//ログインページへ飛ぶ
+		w.Header().Set("Location", "/login")
+		w.WriteHeader(http.StatusTemporaryRedirect)
+	}
+
 	h.t.templ = template.Must(template.ParseFiles(filepath.Join("templates", h.filename)))
 	token, _ := session.GetFlashSession(w, r)
 	data := map[string]interface{}{
