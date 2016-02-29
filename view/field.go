@@ -9,8 +9,8 @@ import (
 	"sync"
 	"text/template"
 
-	"../model/org"
 	"../model/field"
+	"../model/org"
 	"../session"
 )
 
@@ -25,7 +25,7 @@ func NewFieldHandler(filename string) fieldHandler {
 }
 
 func (h *fieldHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	v := strings.Replace(r.RequestURI, "/org/", "", 1)
+	v := strings.Replace(r.URL.Path, "/org/", "", 1)
 	orgId, err := strconv.Atoi(v)
 	if err != nil {
 		panic(err)
@@ -37,12 +37,11 @@ func (h *fieldHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			if _, go_token := session.GetFlashSession(w, r); post_token == go_token {
 				if name := html.EscapeString(r.FormValue("name")); len(name) > 0 {
 					id := field.Insert(name, orgId)
+					oid := strconv.Itoa(orgId)
 					if id > 0 {
-						oid := strconv.Itoa(orgId)
 						w.Header().Set("Location", "/org/"+oid+"?successed")
 						w.WriteHeader(http.StatusTemporaryRedirect)
-					}else{
-						oid := strconv.Itoa(orgId)
+					} else {
 						w.Header().Set("Location", "/org/"+oid+"?error")
 						w.WriteHeader(http.StatusTemporaryRedirect)
 					}
@@ -50,7 +49,6 @@ func (h *fieldHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-						
 	}
 
 	h.once.Do(func() {
@@ -64,8 +62,8 @@ func (h *fieldHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	token, _ := session.GetFlashSession(w, r)
 	data := map[string]interface{}{
-		"Token": token,
-		"Org":   org,
+		"Token":  token,
+		"Org":    org,
 		"Fields": fields,
 	}
 

@@ -9,8 +9,23 @@ import (
 )
 
 type Analysis struct {
-	Id       int
+	Id      int
 	FieldId int
+	ph      float64
+	phk     float64
+	ec      float64
+	php     float64
+	eofph   float64
+	k       float64
+	dk      float64
+	ca      float64
+	dca     float64
+	mg      float64
+	dmg     float64
+	cec     int
+	dcec    float64
+	capermg float64
+	mgperk  float64
 }
 
 func Insert(field_id interface{}) int64 {

@@ -9,6 +9,8 @@ import (
 
 	"../model/org"
 	"../session"
+
+	"github.com/mholt/binding"
 )
 
 type orgHandler struct {
@@ -27,7 +29,13 @@ func (h *orgHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if post_token := r.FormValue("go_token"); len(post_token) > 0 {
 			if _, go_token := session.GetFlashSession(w, r); post_token == go_token {
 				if name := html.EscapeString(r.FormValue("name")); len(name) > 0 {
-					id := org.Insert(name)
+					o := org.NewOrg()
+					err := binding.Bind(r, &o)
+					if err != nil {
+						panic(err)
+					}
+					
+					id := org.Insert(&o)
 					if id > 0 {
 						w.Header().Set("Location", "/admin?successed")
 						w.WriteHeader(http.StatusTemporaryRedirect)

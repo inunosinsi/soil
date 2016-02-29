@@ -2,9 +2,13 @@ package org
 
 import (
 	"database/sql"
+	"net/http"
+	"reflect"
 	"strconv"
+	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/mholt/binding"
 
 	"../../dbconf"
 )
@@ -14,7 +18,18 @@ type Org struct {
 	Name string
 }
 
-func Insert(name interface{}) int64 {
+func NewOrg() Org {
+	return Org{}
+}
+
+func (o *Org) FieldMap(req *http.Request) binding.FieldMap {
+	return binding.FieldMap{
+		&o.Id:   "id",
+		&o.Name: "name",
+	}
+}
+
+func Insert(org *Org) int64 {
 
 	conf := dbconf.GetDBConfig()
 
@@ -24,13 +39,41 @@ func Insert(name interface{}) int64 {
 	}
 	defer db.Close() // 関数がリターンする直前に呼び出される
 
+	o := reflect.Indirect(reflect.ValueOf(org))
+	t := o.Type()
+
+	m := make(map[string]interface{})
+
+	for i := 0; i < t.NumField(); i++ {
+		field := o.Field(i)
+
+		if field.CanSet() {
+			m[t.Field(i).Name] = field.Interface()
+		}
+	}
+
+	sql := "INSERT Organization SET "
+	c := 0
+	values := make([]interface{}, 0)
+	for key, v := range m {
+		if key == "id" || key == "Id" {
+			continue
+		}
+		if c > 0 {
+			sql += ", "
+			c++
+		}
+		sql += strings.ToLower(key) + "=?"
+		values = append(values, v)
+	}
+
 	//データベースに値を突っ込んでみる
-	stmt, err := db.Prepare("INSERT Organization SET name=?")
+	stmt, err := db.Prepare(sql)
 	if err != nil {
 		panic(err)
 	}
 
-	res, err := stmt.Exec(name)
+	res, err := stmt.Exec(values...)
 	if err != nil {
 		panic(err)
 	}
@@ -41,6 +84,7 @@ func Insert(name interface{}) int64 {
 	}
 
 	return id
+
 }
 
 func Get(limit int) *[]Org {
@@ -79,25 +123,25 @@ func Get(limit int) *[]Org {
 
 func GetById(orgId int) *Org {
 	var org Org
-	
+
 	conf := dbconf.GetDBConfig()
-	
-	db, err := sql.Open("mysql", conf.User + ":" + conf.Pass + "@/" + conf.Db)
+
+	db, err := sql.Open("mysql", conf.User+":"+conf.Pass+"@/"+conf.Db)
 	if err != nil {
 		panic(err.Error())
 	}
 	defer db.Close() // 関数がリターンする直前に呼び出される
-	
+
 	stmt, err := db.Prepare("SELECT * FROM Organization WHERE id = ?")
-	if err != nil{
+	if err != nil {
 		panic(err)
 	}
-	
+
 	rows, err := stmt.Query(orgId)
-	if err != nil{
+	if err != nil {
 		panic(err)
 	}
-	
+
 	for rows.Next() {
 		var id int
 		var name string
@@ -107,6 +151,6 @@ func GetById(orgId int) *Org {
 		}
 		org = Org{id, name}
 	}
-	
+
 	return &org
 }
