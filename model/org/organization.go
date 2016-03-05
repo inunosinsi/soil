@@ -2,15 +2,16 @@ package org
 
 import (
 	"database/sql"
+	//	"log"
 	"net/http"
-	"reflect"
 	"strconv"
-	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/mholt/binding"
 
 	"../../dbconf"
+
+	"../../goy/goydb"
 )
 
 type Org struct {
@@ -29,62 +30,18 @@ func (o *Org) FieldMap(req *http.Request) binding.FieldMap {
 	}
 }
 
+func (o *Org) TableName() string {
+	return "Organization"
+}
+
 func Insert(org *Org) int64 {
-
-	conf := dbconf.GetDBConfig()
-
-	db, err := sql.Open("mysql", conf.User+":"+conf.Pass+"@/"+conf.Db)
-	if err != nil {
-		panic(err.Error())
-	}
-	defer db.Close() // 関数がリターンする直前に呼び出される
-
-	o := reflect.Indirect(reflect.ValueOf(org))
-	t := o.Type()
-
-	m := make(map[string]interface{})
-
-	for i := 0; i < t.NumField(); i++ {
-		field := o.Field(i)
-
-		if field.CanSet() {
-			m[t.Field(i).Name] = field.Interface()
-		}
-	}
-
-	sql := "INSERT Organization SET "
-	c := 0
-	values := make([]interface{}, 0)
-	for key, v := range m {
-		if key == "id" || key == "Id" {
-			continue
-		}
-		if c > 0 {
-			sql += ", "
-			c++
-		}
-		sql += strings.ToLower(key) + "=?"
-		values = append(values, v)
-	}
-
-	//データベースに値を突っ込んでみる
-	stmt, err := db.Prepare(sql)
-	if err != nil {
-		panic(err)
-	}
-
-	res, err := stmt.Exec(values...)
-	if err != nil {
-		panic(err)
-	}
-
-	id, err := res.LastInsertId()
+	var dbs goydb.Goydb = org
+	id, err := goydb.Insert(dbs)
 	if err != nil {
 		panic(err)
 	}
 
 	return id
-
 }
 
 func Get(limit int) *[]Org {
