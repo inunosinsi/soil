@@ -28,7 +28,7 @@ func Insert(s Goydb) (int64, error) {
 	defer db.Close()
 
 	tbName := s.TableName()
-	sql := "INSERT " + tbName + " SET "
+	q := "INSERT " + tbName + " SET "
 	c := 0
 
 	values := make([]interface{}, 0)
@@ -37,15 +37,15 @@ func Insert(s Goydb) (int64, error) {
 			continue
 		}
 		if c > 0 {
-			sql += ", "
+			q += ", "
 			c++
 		}
-		sql += strings.ToLower(key) + "=?"
+		q += strings.ToLower(key) + "=?"
 		values = append(values, v)
 	}
 
 	//データベースに値を突っ込んでみる
-	stmt, err := db.Prepare(sql)
+	stmt, err := db.Prepare(q)
 	if err != nil {
 		return 0, err
 	}
