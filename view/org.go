@@ -24,7 +24,7 @@ func NewOrgHandler(filename string) orgHandler {
 }
 
 func (h *orgHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "POST" {
+	if r.Method == "POST" && len(r.URL.RawQuery) == 0 {
 		r.ParseForm()
 		if post_token := r.FormValue("go_token"); len(post_token) > 0 {
 			if _, go_token := session.GetFlashSession(w, r); post_token == go_token {
@@ -34,7 +34,7 @@ func (h *orgHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					if err != nil {
 						panic(err)
 					}
-					
+
 					id := org.Insert(&o)
 					if id > 0 {
 						w.Header().Set("Location", "/admin?successed")

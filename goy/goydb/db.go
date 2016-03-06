@@ -24,7 +24,7 @@ func Insert(s Goydb) (int64, error) {
 
 	m := makeMap(s)
 
-	db := conn()
+	db := Conn()
 	defer db.Close()
 
 	tbName := s.TableName()
@@ -63,7 +63,7 @@ func Insert(s Goydb) (int64, error) {
 	return id, nil
 }
 
-func conn() *sql.DB {
+func Conn() *sql.DB {
 	conf := getConfig()
 
 	db, err := sql.Open("mysql", conf.User+":"+conf.Pass+"@/"+conf.Db)

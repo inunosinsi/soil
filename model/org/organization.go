@@ -1,15 +1,11 @@
 package org
 
 import (
-	"database/sql"
-	//	"log"
 	"net/http"
 	"strconv"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/mholt/binding"
-
-	"../../dbconf"
 
 	"../../goy/goydb"
 )
@@ -45,15 +41,10 @@ func Insert(org *Org) int64 {
 }
 
 func Get(limit int) *[]Org {
-	conf := dbconf.GetDBConfig()
+	db := goydb.Conn()
+	defer db.Close()
 
 	lim := strconv.Itoa(limit)
-
-	db, err := sql.Open("mysql", conf.User+":"+conf.Pass+"@/"+conf.Db)
-	if err != nil {
-		panic(err.Error())
-	}
-	defer db.Close() // 関数がリターンする直前に呼び出される
 
 	rows, err := db.Query("SELECT * FROM Organization LIMIT " + lim)
 	if err != nil {
@@ -81,13 +72,8 @@ func Get(limit int) *[]Org {
 func GetById(orgId int) *Org {
 	var org Org
 
-	conf := dbconf.GetDBConfig()
-
-	db, err := sql.Open("mysql", conf.User+":"+conf.Pass+"@/"+conf.Db)
-	if err != nil {
-		panic(err.Error())
-	}
-	defer db.Close() // 関数がリターンする直前に呼び出される
+	db := goydb.Conn()
+	defer db.Close()
 
 	stmt, err := db.Prepare("SELECT * FROM Organization WHERE id = ?")
 	if err != nil {

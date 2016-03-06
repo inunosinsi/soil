@@ -12,6 +12,8 @@ import (
 	"../model/field"
 	"../model/org"
 	"../session"
+
+	"github.com/mholt/binding"
 )
 
 type fieldHandler struct {
@@ -31,12 +33,19 @@ func (h *fieldHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	if r.Method == "POST" {
+	if r.Method == "POST" && len(r.URL.RawQuery) == 0 {
 		r.ParseForm()
 		if post_token := r.FormValue("go_token"); len(post_token) > 0 {
 			if _, go_token := session.GetFlashSession(w, r); post_token == go_token {
 				if name := html.EscapeString(r.FormValue("name")); len(name) > 0 {
-					id := field.Insert(name, orgId)
+					f := field.NewField()
+					f.OrgId = orgId
+					err := binding.Bind(r, &f)
+					if err != nil {
+						panic(err)
+					}
+
+					id := field.Insert(&f)
 					oid := strconv.Itoa(orgId)
 					if id > 0 {
 						w.Header().Set("Location", "/org/"+oid+"?successed")

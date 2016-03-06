@@ -1,12 +1,13 @@
 package field
 
 import (
-	"database/sql"
+	"net/http"
 	"strconv"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/mholt/binding"
 
-	"../../dbconf"
+	"../../goy/goydb"
 )
 
 type Field struct {
@@ -15,28 +16,25 @@ type Field struct {
 	OrgId int
 }
 
-func Insert(name interface{}, org_id interface{}) int64 {
+func NewField() Field {
+	return Field{}
+}
 
-	conf := dbconf.GetDBConfig()
-
-	db, err := sql.Open("mysql", conf.User+":"+conf.Pass+"@/"+conf.Db)
-	if err != nil {
-		panic(err.Error())
+func (f *Field) FieldMap(req *http.Request) binding.FieldMap {
+	return binding.FieldMap{
+		&f.Id:    "id",
+		&f.Name:  "name",
+		&f.OrgId: "org_id",
 	}
-	defer db.Close() // 関数がリターンする直前に呼び出される
+}
 
-	//データベースに値を突っ込んでみる
-	stmt, err := db.Prepare("INSERT Field SET name=?, org_id=?")
-	if err != nil {
-		panic(err)
-	}
+func (f *Field) TableName() string {
+	return "Field"
+}
 
-	res, err := stmt.Exec(name, org_id)
-	if err != nil {
-		panic(err)
-	}
-
-	id, err := res.LastInsertId()
+func Insert(field *Field) int64 {
+	var dbs goydb.Goydb = field
+	id, err := goydb.Insert(dbs)
 	if err != nil {
 		panic(err)
 	}
@@ -45,15 +43,10 @@ func Insert(name interface{}, org_id interface{}) int64 {
 }
 
 func Get(limit int) *[]Field {
-	conf := dbconf.GetDBConfig()
+	db := goydb.Conn()
+	defer db.Close()
 
 	lim := strconv.Itoa(limit)
-
-	db, err := sql.Open("mysql", conf.User+":"+conf.Pass+"@/"+conf.Db)
-	if err != nil {
-		panic(err.Error())
-	}
-	defer db.Close() // 関数がリターンする直前に呼び出される
 
 	rows, err := db.Query("SELECT * FROM Field LIMIT " + lim)
 	if err != nil {
