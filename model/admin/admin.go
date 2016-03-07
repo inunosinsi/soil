@@ -1,28 +1,39 @@
 package admin
 
 import (
-	"database/sql"
+	"net/http"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/mholt/binding"
 
-	"../../dbconf"
+	"../../goy/goydb"
 )
 
 type Admin struct {
 	Id       int
-	LoginId string
+	LoginId  string
 	Password string
 }
 
-func Check() bool {
+func NewAdmin() Admin {
+	return Admin{}
+}
 
-	conf := dbconf.GetDBConfig()
-
-	db, err := sql.Open("mysql", conf.User+":"+conf.Pass+"@/"+conf.Db)
-	if err != nil {
-		db.Close()
-		return false
+func (a *Admin) FieldMap(req *http.Request) binding.FieldMap {
+	return binding.FieldMap{
+		&a.Id:       "id",
+		&a.LoginId:  "login_id",
+		&a.Password: "password",
 	}
+}
+
+func (a *Admin) TableName() string {
+	return "Administrator"
+}
+
+func Check() bool {
+	db := goydb.Conn()
+	defer db.Close()
 
 	res, err := db.Query("SELECT id FROM Administrator LIMIT 1")
 	if err != nil {
@@ -47,28 +58,9 @@ func Check() bool {
 	return true
 }
 
-func Insert(loginId interface{}, password interface{}) int64 {
-
-	conf := dbconf.GetDBConfig()
-
-	db, err := sql.Open("mysql", conf.User+":"+conf.Pass+"@/"+conf.Db)
-	if err != nil {
-		panic(err.Error())
-	}
-	defer db.Close() // 関数がリターンする直前に呼び出される
-
-	//データベースに値を突っ込んでみる
-	stmt, err := db.Prepare("INSERT Administrator SET login_id=?,password=?")
-	if err != nil {
-		panic(err)
-	}
-
-	res, err := stmt.Exec(loginId, password)
-	if err != nil {
-		panic(err)
-	}
-
-	id, err := res.LastInsertId()
+func Insert(a *Admin) int64 {
+	var dbs goydb.Goydb = a
+	id, err := goydb.Insert(dbs)
 	if err != nil {
 		panic(err)
 	}
@@ -79,13 +71,8 @@ func Insert(loginId interface{}, password interface{}) int64 {
 func GetPasswordHashByLoginId(loginId string) string {
 	var passHash string
 
-	conf := dbconf.GetDBConfig()
-
-	db, err := sql.Open("mysql", conf.User+":"+conf.Pass+"@/"+conf.Db)
-	if err != nil {
-		panic(err.Error())
-	}
-	defer db.Close() // 関数がリターンする直前に呼び出される
+	db := goydb.Conn()
+	defer db.Close()
 
 	stmt, err := db.Prepare("SELECT password FROM Administrator WHERE login_id = ?")
 	if err != nil {

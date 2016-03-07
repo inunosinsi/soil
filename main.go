@@ -59,6 +59,9 @@ func main() {
 	fieldHandler := view.NewFieldHandler("field.html")
 	http.Handle("/org/", MustAuth(&fieldHandler)) //URLがつづく場合は末尾にスラッシュ
 
+	fieldDetailHandler := view.NewFieldDetailHandler("field_d.html")
+	http.Handle("/field/", MustAuth(&fieldDetailHandler)) //URLがつづく場合は末尾にスラッシュ
+
 	//ログインページを開くときは常にAdministratorのテーブルがあるか調べる
 	http.Handle("/login", view.CheckDB(&templateHandler{filename: "login.html"}))
 

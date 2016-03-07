@@ -53,9 +53,70 @@ func Get(limit int) *[]Field {
 		panic(err.Error())
 	}
 
-	//SQLで結果の取得数を調べてから配列を用意
 	list := make([]Field, 0)
 
+	for rows.Next() {
+		var id int
+		var name string
+		var orgId int
+		err = rows.Scan(&id, &name, &orgId)
+		if err != nil {
+			panic(err)
+		}
+		if id > 0 {
+			list = append(list, Field{id, name, orgId})
+		}
+	}
+
+	return &list
+}
+
+func GetById(fieldId int) *Field {
+	var f Field
+	
+	db := goydb.Conn()
+	defer db.Close()
+	
+	stmt, err := db.Prepare("SELECT * FROM Field WHERE id = ?")
+	if err != nil {
+		panic(err)
+	}
+
+	rows, err := stmt.Query(fieldId)
+	if err != nil {
+		panic(err)
+	}
+		
+	for rows.Next() {
+		var id int
+		var name string
+		var orgId int
+		err = rows.Scan(&id, &name, &orgId)
+		if err != nil {
+			panic(err)
+		}
+		f = Field{id, name, orgId}
+	}
+
+	return &f
+}
+
+func GetByOrgId(orgId int) *[]Field {
+	db := goydb.Conn()
+	defer db.Close()
+	
+	stmt, err := db.Prepare("SELECT * FROM Field WHERE org_id = ?")
+	if err != nil {
+		panic(err)
+	}
+
+	rows, err := stmt.Query(orgId)
+	if err != nil {
+		panic(err)
+	}
+	
+	list := make([]Field, 0)
+	
 	for rows.Next() {
 		var id int
 		var name string

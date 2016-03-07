@@ -10,6 +10,8 @@ import (
 	"../login"
 	"../model/admin"
 	"../session"
+	
+	"github.com/mholt/binding"
 )
 
 func NewInitHandler(filename string) initHandler {
@@ -33,9 +35,15 @@ func (h *initHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 				//入力した内容が一致した時
 				if password == confirm {
-					loginId := html.EscapeString(r.FormValue("login_id"))
-					hash := login.CreateHashString(password)
-					id := admin.Insert(loginId, hash)
+					a := admin.NewAdmin()
+					err := binding.Bind(r, &a)
+					if err != nil {
+						panic(err)
+					}
+					
+					a.Password = login.CreateHashString(password)
+					id := admin.Insert(&a)
+					
 					if id > 0 {
 						//ログインページへ飛ぶ
 						w.Header().Set("Location", "/login")

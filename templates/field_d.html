@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>土壌分析記録</title>
+</head>
+<body>
+<section>
+	<a href="/admin">戻る</a>
+	<h1>{{.Field.Name}}</h1>
+</section>
+<section>
+	<form method="POST">
+		<input type="hidden" name="go_token" value="{{.Token}}">
+		分析日：<input type="date" name="date" value="">&nbsp;
+		<input type="submit" value="登録">
+	</form>
+</section>
+
+</body>
+</html>
