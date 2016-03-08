@@ -10,7 +10,7 @@ import (
 	"../login"
 	"../model/admin"
 	"../session"
-	
+
 	"github.com/mholt/binding"
 )
 
@@ -40,10 +40,10 @@ func (h *initHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					if err != nil {
 						panic(err)
 					}
-					
+
 					a.Password = login.CreateHashString(password)
 					id := admin.Insert(&a)
-					
+
 					if id > 0 {
 						//ログインページへ飛ぶ
 						w.Header().Set("Location", "/login")

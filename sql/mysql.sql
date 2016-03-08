@@ -19,6 +19,7 @@ CREATE TABLE Analysis (
 	id INTEGER PRIMARY KEY AUTO_INCREMENT,
 	field_id INTEGER NOT NULL,
 	field_key VARCHAR(255) UNIQUE,
+	analysis_date DATE NOT NULL,
 	ph DOUBLE(2,1),
 	phk DOUBLE(2,1),
 	ec DOUBLE(3,2),

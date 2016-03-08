@@ -36,12 +36,20 @@ func Insert(s Goydb) (int64, error) {
 		if key == "id" || key == "Id" {
 			continue
 		}
+		
 		if c > 0 {
 			q += ", "
-			c++
+		}
+		if strings.Index(key, "D") > 0 {
+			key = strings.Replace(key, "D", "_d", 1)
+		} else if strings.Index(key, "I") > 0 {
+			key = strings.Replace(key, "I", "_i", 1)
+		} else if strings.Index(key, "K") > 0 {
+			key = strings.Replace(key, "K", "_k", 1)
 		}
 		q += strings.ToLower(key) + "=?"
 		values = append(values, v)
+		c++
 	}
 
 	//データベースに値を突っ込んでみる

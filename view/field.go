@@ -2,6 +2,7 @@ package view
 
 import (
 	"html"
+	"log"
 	"net/http"
 	"path/filepath"
 	"strconv"
@@ -9,8 +10,10 @@ import (
 	"sync"
 	"text/template"
 
-	"../model/org"
+	"../login"
+	"../model/analysis"
 	"../model/field"
+	"../model/org"
 	"../session"
 
 	"github.com/mholt/binding"
@@ -98,32 +101,39 @@ func (h *fieldDetailHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
+	field := field.GetById(fieldId)
+
 	if r.Method == "POST" && len(r.URL.RawQuery) == 0 {
-/**
+
 		r.ParseForm()
 		if post_token := r.FormValue("go_token"); len(post_token) > 0 {
 			if _, go_token := session.GetFlashSession(w, r); post_token == go_token {
-				if name := html.EscapeString(r.FormValue("name")); len(name) > 0 {
-					f := field.NewField()
-					err := binding.Bind(r, &f)
+				if date := html.EscapeString(r.FormValue("analysis_date")); len(date) > 0 {
+					a := analysis.NewAnalysis()
+					err := binding.Bind(r, &a)
 					if err != nil {
 						panic(err)
 					}
 
-					f.OrgId = orgId
-					id := field.Insert(&f)
-					oid := strconv.Itoa(orgId)
+					a.FieldId = fieldId
+
+					//フィールドKEYの登録 フィールド名とフィールドIDでハッシュを作る
+					fid := strconv.Itoa(fieldId)
+					a.FieldKey = login.CulcHash(field.Name, fid)
+					log.Println(a)
+
+					id := analysis.Insert(&a)
 					if id > 0 {
-						w.Header().Set("Location", "/org/"+oid+"?successed")
+						w.Header().Set("Location", "/field/"+fid+"?successed")
 						w.WriteHeader(http.StatusTemporaryRedirect)
 					} else {
-						w.Header().Set("Location", "/org/"+oid+"?error")
+						w.Header().Set("Location", "/field/"+fid+"?error")
 						w.WriteHeader(http.StatusTemporaryRedirect)
 					}
 				}
 			}
 		}
-**/
+
 	}
 
 	h.once.Do(func() {
@@ -131,13 +141,14 @@ func (h *fieldDetailHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			template.Must(template.ParseFiles(filepath.Join("templates",
 				h.filename)))
 	})
-
-	field := field.GetById(fieldId)
 	
+	analysis := analysis.GetByFieldId(fieldId)
+
 	token, _ := session.GetFlashSession(w, r)
 	data := map[string]interface{}{
-		"Token":  token,
-		"Field":    field,
+		"Token": token,
+		"Field": field,
+		"Analysis": analysis,
 	}
 
 	h.templ.Execute(w, data)
