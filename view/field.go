@@ -2,7 +2,6 @@ package view
 
 import (
 	"html"
-	"log"
 	"net/http"
 	"path/filepath"
 	"strconv"
@@ -120,7 +119,6 @@ func (h *fieldDetailHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					//フィールドKEYの登録 フィールド名とフィールドIDでハッシュを作る
 					fid := strconv.Itoa(fieldId)
 					a.FieldKey = login.CulcHash(field.Name, fid)
-					log.Println(a)
 
 					id := analysis.Insert(&a)
 					if id > 0 {
@@ -141,13 +139,13 @@ func (h *fieldDetailHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			template.Must(template.ParseFiles(filepath.Join("templates",
 				h.filename)))
 	})
-	
+
 	analysis := analysis.GetByFieldId(fieldId)
 
 	token, _ := session.GetFlashSession(w, r)
 	data := map[string]interface{}{
-		"Token": token,
-		"Field": field,
+		"Token":    token,
+		"Field":    field,
 		"Analysis": analysis,
 	}
 

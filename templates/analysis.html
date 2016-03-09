@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>土壌分析数字入力</title>
+</head>
+<body>
+<section>
+	<a href="/field/{{.Analysis.FieldId}}">戻る</a>
+</section>
+<section>
+	<h1>{{.Field.Name}} {{.Analysis.AnalysisDate}}</h1>
+	<form method="POST">
+		<input type="hidden" name="go_token" value="{{.Token}}">
+	<dl>
+		<dt>分析日</dt>
+		<dd>
+			<input type="date" name="analysis_date" value="{{.Analysis.AnalysisDate}}">
+		</dd>
+		
+		<dt>pH 水浸透(H2O)</dt>
+		<dd>
+			<input type="number" name="ph" value="{{.Analysis.Ph}}" placeholder="6.0" step="0.1" min="4.0" max="10.0">
+		</dd>
+		
+		<dt>pH 塩化浸透(KCl)</dt>
+		<dd>
+			<input type="number" name="phk" value="{{.Analysis.Phk}}" placeholder="6.0" step="0.1" min="4.0" max="10.0">
+		</dd>
+		
+		<dt>EC 電気伝導率</dt>
+		<dd>
+			<input type="number" name="ec" value="{{.Analysis.Ec}}" placeholder="0.2" step="0.01">
+		</dd>
+		
+		<dt>リン酸吸収係数</dt>
+		<dd>
+			<input type="number" name="php" value="{{.Analysis.Php}}" placeholder="700">
+		</dd>
+		
+		<dt>有効態リン酸</dt>
+		<dd>
+			<input type="number" name="eofph" value="{{.Analysis.Eofph}}" placeholder="60">
+		</dd>
+		
+		<dt>カリ</dt>
+		<dd>
+			<input type="number" name="k" value="{{.Analysis.K}}" placeholder="51" step="0.1">
+		</dd>
+		
+		<dt>石灰</dt>
+		<dd>
+			<input type="number" name="ca" value="{{.Analysis.Ca}}" placeholder="153" step="0.1">
+		</dd>
+		
+		<dt>苦土</dt>
+		<dd>
+			<input type="number" name="mg" value="{{.Analysis.Mg}}" placeholder="44" step="0.1">
+		</dd>
+		
+		<dt>CEC</dt>
+		<dd>
+			<input type="number" name="cec" value="{{.Analysis.Cec}}" placeholder="15" step="0.1">
+		</dd>
+	</dl>
+	<p>
+		<input type="hidden" name="field_id" value="{{.Analysis.FieldId}}">
+		<input type="hidden" name="field_key" value="{{.Analysis.FieldKey}}">
+		<input type="hidden" name="id" value="{{.Analysis.Id}}">
+		<input type="submit" value="更新">
+	</p>
+	</form>
+</section>
+</body>
+</html>

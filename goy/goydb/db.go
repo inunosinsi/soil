@@ -71,6 +71,49 @@ func Insert(s Goydb) (int64, error) {
 	return id, nil
 }
 
+func Update(s Goydb) error {
+	//構造体であるか調べる
+	if v := reflect.Indirect(reflect.ValueOf(s)); v.Kind().String() != "struct" {
+		return errors.New("Not Struct")
+	}
+
+	m := makeMap(s)
+
+	db := Conn()
+	defer db.Close()
+
+	tbName := s.TableName()
+	q := "UPDATE " + tbName + " SET "
+	c := 0
+
+	values := make([]interface{}, 0)
+	for key, v := range m {
+		
+		if c > 0 {
+			q += ", "
+		}
+		if strings.Index(key, "D") > 0 {
+			key = strings.Replace(key, "D", "_d", 1)
+		} else if strings.Index(key, "I") > 0 {
+			key = strings.Replace(key, "I", "_i", 1)
+		} else if strings.Index(key, "K") > 0 {
+			key = strings.Replace(key, "K", "_k", 1)
+		}
+		q += strings.ToLower(key) + "=?"
+		values = append(values, v)
+		c++
+	}
+
+	//データベースに値を突っ込んでみる
+	stmt, err := db.Prepare(q)
+	if err != nil {
+		return err
+	}
+
+	_, err = stmt.Exec(values...)
+	return err
+}
+
 func Conn() *sql.DB {
 	conf := getConfig()
 

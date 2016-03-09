@@ -1,29 +1,31 @@
 package view
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
-	"path/filepath"
-	"sync"
-	"text/template"
+
+	"../model/analysis"
 )
 
 type jsonHandler struct {
-	once     sync.Once
-	filename string
-	templ    *template.Template
 }
 
-func NewJsonHandler(filename string) jsonHandler {
-	return jsonHandler{filename: filename}
+func NewJsonHandler() jsonHandler {
+	return jsonHandler{}
 }
 
 func (h *jsonHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
-	h.once.Do(func() {
-		h.templ =
-			template.Must(template.ParseFiles(filepath.Join("templates",
-				h.filename)))
-	})
+	/**
+	 * @ToDo field_keyで取得できる様にしたい
+	 */
+	a := analysis.GetById(2)
 
-	h.templ.Execute(w, nil)
+	out, err := json.Marshal(a)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Fprint(w, string(out))
 }

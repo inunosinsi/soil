@@ -97,7 +97,7 @@ func GetById(fieldId int) *Field {
 		}
 		f = Field{id, name, orgId}
 	}
-
+	
 	return &f
 }
 

@@ -51,16 +51,24 @@ func main() {
 	 * ・土壌分析登録ページ
 	 * ・APIのページ
 	 */
+	//外部cssや外部js用
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
 
 	//管理画面トップ
 	orgHandler := view.NewOrgHandler("admin.html")
 	http.Handle("/admin", MustAuth(&orgHandler))
 
-	fieldHandler := view.NewFieldHandler("field.html")
+	fieldHandler := view.NewFieldHandler("org.html")
 	http.Handle("/org/", MustAuth(&fieldHandler)) //URLがつづく場合は末尾にスラッシュ
 
-	fieldDetailHandler := view.NewFieldDetailHandler("field_d.html")
+	fieldDetailHandler := view.NewFieldDetailHandler("field.html")
 	http.Handle("/field/", MustAuth(&fieldDetailHandler)) //URLがつづく場合は末尾にスラッシュ
+	
+	analysisHandler := view.NewAnalysisHandler("analysis.html")
+	http.Handle("/analysis/", MustAuth(&analysisHandler)) //URLがつづく場合は末尾にスラッシュ
+	
+	graphHandler := view.NewGraphHandler("graph.html")
+	http.Handle("/graph/", &graphHandler) //URLがつづく場合は末尾にスラッシュ
 
 	//ログインページを開くときは常にAdministratorのテーブルがあるか調べる
 	http.Handle("/login", view.CheckDB(&templateHandler{filename: "login.html"}))
@@ -70,7 +78,7 @@ func main() {
 	initHandler := view.NewInitHandler("init.html")
 	http.Handle("/init", &initHandler)
 
-	jsonHandler := view.NewJsonHandler("call.json")
+	jsonHandler := view.NewJsonHandler()
 	http.Handle("/call.json", &jsonHandler)
 
 	log.Println("Webサーバーを開始します。ポート: ", *addr)

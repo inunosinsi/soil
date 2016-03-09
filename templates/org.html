@@ -1,28 +1,31 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>土壌分析記録</title>
+<title>圃場名記録</title>
 </head>
 <body>
 <section>
 	<a href="/admin">戻る</a>
-	<h1>{{.Field.Name}}</h1>
+	<h1>{{.Org.Name}}</h1>
 </section>
 <section>
 	<form method="POST">
 		<input type="hidden" name="go_token" value="{{.Token}}">
-		分析日：<input type="date" name="analysis_date" value="">&nbsp;
+		圃場名：<input type="text" name="name" value="">&nbsp;
 		<input type="submit" value="登録">
 	</form>
 </section>
 
 <section>
 	<ul>
-		{{range $index, $a := .Analysis}}
-		<li><a href="/analysis/{{$a.Id}}">{{$a.AnalysisDate}}</a></li>
+		{{range $index, $f := .Fields}}
+		<li><a href="/field/{{$f.Id}}">{{$f.Name}}</a></li>
 		{{end}}	
 	</ul>
 </section>
 
+<section>
+	<h1>法人名の修正</h1>
+</section>
 </body>
 </html>

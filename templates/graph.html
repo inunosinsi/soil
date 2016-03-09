@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Graph</title>
+<script src="/static/js/Chart.min.js"></script>
+</head>
+<body>
+<canvas id="myChart" width="400" height="400"></canvas>
+<script>
+var data = {
+    labels: ["塩基飽和度", "pH", "EC", "リン酸", "カリ", "石灰", "苦土", "CEC"],
+    datasets: [
+        {
+            label: "基準値",
+            fillColor: "rgba(220,220,220,0.2)",
+            strokeColor: "rgba(220,220,220,1)",
+            pointColor: "rgba(220,220,220,1)",
+            pointStrokeColor: "#fff",
+            pointHighlightFill: "#fff",
+            pointHighlightStroke: "rgba(220,220,220,1)",
+            data: [50, 50, 50, 50, 50, 50, 50, 50]
+        },
+        {
+            label: "分析値",
+            fillColor: "rgba(151,187,205,0.2)",
+            strokeColor: "rgba(151,187,205,1)",
+            pointColor: "rgba(151,187,205,1)",
+            pointStrokeColor: "#fff",
+            pointHighlightFill: "#fff",
+            pointHighlightStroke: "rgba(151,187,205,1)",
+            data: [60, {{.Ph}}, {{.Ec}}, {{.Eofph}}, {{.K}}, {{.Ca}}, {{.Mg}}, {{.Cec}}]
+        }
+    ]
+};
+var options = {};
+
+(function(){
+	var ctx = document.querySelector("#myChart").getContext("2d");
+	var myRadarChart = new Chart(ctx).Radar(data, options);
+})();
+</script>
+</body>
+</html>
